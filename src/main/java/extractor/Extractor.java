@@ -1,17 +1,16 @@
 package extractor;
 
-import links.Link;
-import org.citygml4j.geometry.BoundingBox;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
+import org.citygml4j.model.citygml.building.BuildingPart;
 import org.citygml4j.model.citygml.building.BuildingPartProperty;
 import org.citygml4j.model.citygml.core.AbstractCityObject;
 import org.citygml4j.model.citygml.core.CityModel;
 import org.citygml4j.model.citygml.core.CityObjectMember;
 import org.citygml4j.model.gml.geometry.primitives.AbstractSolid;
 import org.apache.commons.lang.NotImplementedException;
+import org.citygml4j.model.gml.geometry.primitives.SolidProperty;
 
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Objects.isNull;
 
@@ -73,19 +72,30 @@ public class Extractor {
 
 
     private void parseBuilding(AbstractBuilding b, GeometricStrategy str) {
-        String id = b.getId();
         if (!isNull(b.getLod2Solid())) {
-            AbstractSolid shape = b.getLod2Solid().getSolid();
-            str.evaluate(id, shape);
+            parseSolid(b.getId(), b.getLod2Solid(), str);
         } else if (b.isSetConsistsOfBuildingPart()) {
-            List<BuildingPartProperty> bps = b.getConsistsOfBuildingPart();
-            for (BuildingPartProperty bp : bps) {
-                //bp.
-                System.out.println("WARNING: Skipping Building part!");
+            List<BuildingPartProperty> ps = b.getConsistsOfBuildingPart();
+            for (BuildingPartProperty p : ps) {
+                BuildingPart bp = p.getBuildingPart();
+                if (!isNull(bp.getLod2Solid())) {
+                    parseSolid(bp.getId(), bp.getLod2Solid(), str);
+                } else if (!isNull(bp.getLod1Solid())) {
+                    System.out.println("WARNING: Ignoring LOD1-only object!");
+                } else
+                    throw new NotImplementedException
+                            ("Unsupported geometry LOD at BuildingPart@"
+                                    + bp.getId());
             }
         } else
             throw new NotImplementedException
                     ("Unsupported geometry LOD at Building@" + b.getId());
+    }
+
+    private void parseSolid(String id, SolidProperty shape,
+                            GeometricStrategy str) {
+        AbstractSolid s = shape.getSolid();
+        str.evaluate(id, s);
     }
 
 
