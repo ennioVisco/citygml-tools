@@ -8,6 +8,8 @@ import extractor.Extractor;
 import extractor.GeometricObject;
 import extractor.GeometricStrategy;
 import extractor.NearEnoughStrategy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.citygml4j.CityGMLContext;
 import org.citygml4j.builder.jaxb.CityGMLBuilder;
 import org.citygml4j.model.citygml.core.CityModel;
@@ -17,6 +19,7 @@ import org.citygml4j.xml.io.reader.CityGMLReader;
 import links.*;
 
 public class Main {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Basic settings strings, they choose the file to load
@@ -34,14 +37,14 @@ public class Main {
         Statistics statistics = null;
 
 
-        System.out.println("Loading CityGML model at: "
+        LOGGER.info("Loading CityGML model at: "
                           + IN_FILE_PATH + "...");
         cityGML = loadCityModel(IN_FILE_PATH);
 
-        System.out.println("Processing Link Extraction routine...");
+        LOGGER.info("Processing Link Extraction routine...");
         links = extractLinks(cityGML);
 
-        System.out.println("Storing links at: " + OUT_FILE_PATH + "...");
+        LOGGER.info("Storing links at: " + OUT_FILE_PATH + "...");
         storeFile(links.toString());
 
         //System.out.println("Export to GML..");

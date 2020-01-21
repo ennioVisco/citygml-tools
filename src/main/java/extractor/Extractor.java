@@ -7,6 +7,8 @@ import org.citygml4j.model.citygml.core.AbstractCityObject;
 import org.citygml4j.model.citygml.core.CityModel;
 import org.citygml4j.model.citygml.core.CityObjectMember;
 import org.citygml4j.model.gml.geometry.primitives.AbstractSolid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.commons.lang.NotImplementedException;
 import org.citygml4j.model.gml.geometry.primitives.SolidProperty;
 
@@ -19,8 +21,9 @@ import static java.util.Objects.isNull;
  * It stores the city model, so that multiple extractions can be executed.
  */
 public class Extractor {
-    private CityModel city;
+    private static final Logger LOGGER = LogManager.getLogger();
 
+    private CityModel city;
 
     public Extractor(CityModel city) {
         this.city = city;
@@ -81,7 +84,7 @@ public class Extractor {
                 if (!isNull(bp.getLod2Solid())) {
                     parseSolid(bp.getId(), bp.getLod2Solid(), str);
                 } else if (!isNull(bp.getLod1Solid())) {
-                    System.out.println("WARNING: Ignoring LOD1-only object!");
+                    LOGGER.warn("Ignoring LOD1-only object!");
                 } else
                     throw new NotImplementedException
                             ("Unsupported geometry LOD at BuildingPart@"
