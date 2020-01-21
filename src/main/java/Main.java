@@ -1,15 +1,17 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import extractor.Extractor;
+import extractor.GeometricObject;
+import extractor.GeometricStrategy;
+import extractor.NearEnoughStrategy;
 import org.citygml4j.CityGMLContext;
 import org.citygml4j.builder.jaxb.CityGMLBuilder;
-import org.citygml4j.builder.jaxb.CityGMLBuilderException;
 import org.citygml4j.model.citygml.core.CityModel;
 import org.citygml4j.xml.io.CityGMLInputFactory;
-import org.citygml4j.xml.io.reader.CityGMLReadException;
 import org.citygml4j.xml.io.reader.CityGMLReader;
 
 import links.*;
@@ -26,7 +28,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         CityModel cityGML;
-        List<Link> links;
+        List<? extends GeometricObject> links;
 
         //GMLExporter exporter = null;
         Statistics statistics = null;
@@ -36,7 +38,9 @@ public class Main {
                           + IN_FILE_PATH + "...");
         cityGML = loadCityModel(IN_FILE_PATH);
 
+        System.out.println("Processing Link Extraction routine...");
         links = extractLinks(cityGML);
+
         System.out.println("Storing links at: " + OUT_FILE_PATH + "...");
         storeFile(links.toString());
 
@@ -77,9 +81,10 @@ public class Main {
      * @param model the CityModel from citygml4j
      * @return a list of links
      */
-    public static List<Link> extractLinks(CityModel model)  {
+    public static List<? extends GeometricObject> extractLinks(CityModel model)  {
         Extractor extractor = new Extractor(model);
-        return extractor.extract();
+        GeometricStrategy strategy = new NearEnoughStrategy();
+        return extractor.extract(strategy);
     }
 
     /**

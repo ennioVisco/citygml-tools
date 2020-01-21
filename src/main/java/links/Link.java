@@ -1,9 +1,11 @@
 package links;
 
+import extractor.GeometricObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Link {
+public final class Link implements GeometricObject {
     public String Id;
     public String Type;
     public List<Node> Nodes;
@@ -12,7 +14,7 @@ public final class Link {
         this(id, type, new ArrayList<Node>());
     }
 
-    public Link(String id, String type, List nodes) {
+    public Link(String id, String type, List<Node> nodes) {
         Id = id;
         Type = type;
         Nodes = nodes;
