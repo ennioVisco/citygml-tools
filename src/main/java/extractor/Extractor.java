@@ -1,5 +1,7 @@
 package extractor;
 
+import extractor.geometric.GeometricObject;
+import extractor.geometric.GeometricStrategy;
 import org.citygml4j.model.citygml.building.AbstractBuilding;
 import org.citygml4j.model.citygml.building.BuildingPart;
 import org.citygml4j.model.citygml.building.BuildingPartProperty;

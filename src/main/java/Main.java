@@ -1,13 +1,12 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import extractor.Extractor;
-import extractor.GeometricObject;
-import extractor.GeometricStrategy;
-import extractor.NearEnoughStrategy;
+import extractor.geometric.GeometricObject;
+import extractor.geometric.GeometricStrategy;
+import extractor.geometric.NearEnoughStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.citygml4j.CityGMLContext;
@@ -15,8 +14,6 @@ import org.citygml4j.builder.jaxb.CityGMLBuilder;
 import org.citygml4j.model.citygml.core.CityModel;
 import org.citygml4j.xml.io.CityGMLInputFactory;
 import org.citygml4j.xml.io.reader.CityGMLReader;
-
-import links.*;
 
 public class Main {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -37,15 +34,15 @@ public class Main {
         Statistics statistics = null;
 
 
-        LOGGER.info("Loading CityGML model at: "
-                          + IN_FILE_PATH + "...");
+        LOGGER.info("Loading CityGML model at: " + IN_FILE_PATH + "...");
         cityGML = loadCityModel(IN_FILE_PATH);
 
         LOGGER.info("Processing Link Extraction routine...");
         links = extractLinks(cityGML);
 
         LOGGER.info("Storing links at: " + OUT_FILE_PATH + "...");
-        storeFile(links.toString());
+        //storeFile(links.toString());
+        System.out.println(links.toString());
 
         //System.out.println("Export to GML..");
         //exporter = new GMLExporter(city2D);
