@@ -2,6 +2,8 @@ package extractor.geometric;
 
 import links.Link;
 import links.Node;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.citygml4j.geometry.BoundingBox;
 import org.citygml4j.model.gml.geometry.AbstractGeometry;
 import org.citygml4j.model.gml.geometry.primitives.AbstractSolid;
@@ -25,6 +27,8 @@ import java.util.Map;
  * @see GeometricStrategy for information about how these strategies are called
  */
 public class NearEnoughStrategy implements GeometricStrategy {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private Map<String, AbstractGeometry> shapes;
     private List<Link> links;
 
@@ -51,8 +55,8 @@ public class NearEnoughStrategy implements GeometricStrategy {
      */
     @Override
     public List<? extends GeometricObject> results() {
+        LOGGER.debug("N. of Shapes:" + shapes.size());
         generateLinks(GeometryOperations.checkNearEnough(shapes));
-
         return links;
     }
 

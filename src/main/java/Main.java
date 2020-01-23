@@ -41,8 +41,8 @@ public class Main {
         links = extractLinks(cityGML);
 
         LOGGER.info("Storing links at: " + OUT_FILE_PATH + "...");
-        //storeFile(links.toString());
-        System.out.println(links.toString());
+        storeFile(links.toString());
+        //System.out.println(links.toString());
 
         //System.out.println("Export to GML..");
         //exporter = new GMLExporter(city2D);

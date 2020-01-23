@@ -1,5 +1,7 @@
 package extractor.geometric;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.javatuples.Triplet;
 import org.citygml4j.geometry.BoundingBox;
 import org.citygml4j.model.gml.geometry.AbstractGeometry;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class GeometryOperations {
 
     public static final double DISTANCE_THRESHOLD = 0;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This method calculates the pairwise distance between
@@ -37,8 +40,11 @@ public class GeometryOperations {
         for (Map.Entry<String, Geometry> g1 : geometries.entrySet()) {
             for (Map.Entry<String, Geometry> g2 : geometries.entrySet()) {
                 double dist = DistanceOp.distance(g1.getValue(), g2.getValue());
-                if(dist > DISTANCE_THRESHOLD)
+                if(dist > DISTANCE_THRESHOLD) {
+                    LOGGER.trace("Geometries:<" + g1.getKey() + "> and <" + g2.getKey() + "> are " + dist + " far!");
                     near.add(new Triplet<>(g1.getKey(), g2.getKey(), dist));
+                } else
+                    LOGGER.trace("Geometries:<" + g1.getKey() + "> and <" + g2.getKey() + "> are touching!");
             }
         }
         return near;
