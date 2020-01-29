@@ -7,6 +7,7 @@ import extractor.Extractor;
 import extractor.geometric.GeometricObject;
 import extractor.geometric.GeometricStrategy;
 import extractor.geometric.NearEnoughStrategy;
+import links.Link;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.citygml4j.CityGMLContext;
@@ -23,7 +24,7 @@ public class Main {
      * and the file to generate
      */
     static final private String P = System.getProperty("user.dir");
-    static final String IN_FILE_PATH = P + "/data/in.gml";
+    static final String IN_FILE_PATH = P + "/data/in_full.gml";
     static final String OUT_FILE_PATH = P + "/data/out.gml";
 
     public static void main(String[] args) throws Exception {
@@ -41,7 +42,7 @@ public class Main {
         links = extractLinks(cityGML);
 
         LOGGER.info("Storing links at: " + OUT_FILE_PATH + "...");
-        storeFile(links.toString());
+        storeFile((List<Link>)links);
         //System.out.println(links.toString());
 
         //System.out.println("Export to GML..");
@@ -88,16 +89,16 @@ public class Main {
     }
 
     /**
-     * IO Action: stores the output in the destination file.
+     * IO Action: stores the links in the destination file.
      *
-     * @param text the content to store
+     * @param links the links to store
      * @throws IOException thrown if the file is not found.
      */
-    public static void storeFile(String text) throws IOException {
-        // Outputting
-        File file = new File(OUT_FILE_PATH);
-        FileWriter writer = new FileWriter(file);
-        writer.write(text);
+    public static void storeFile(List<Link> links) throws IOException {
+        FileWriter writer = new FileWriter(OUT_FILE_PATH);
+        for(Link link: links) {
+            writer.write(link.toString() + System.lineSeparator());
+        }
         writer.close();
     }
 }

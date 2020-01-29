@@ -41,6 +41,7 @@ public class Extractor {
      */
     public List<? extends GeometricObject> extract(GeometricStrategy strategy) {
         traverseNodes(strategy);
+        LOGGER.debug("Nodes traversed, storing results.");
         return strategy.results();
     }
 
@@ -52,7 +53,7 @@ public class Extractor {
     private void traverseNodes(GeometricStrategy strategy) {
         List<CityObjectMember> members = city.getCityObjectMember();
 
-        LOGGER.debug("N. of Objects:" + members.size());
+        LOGGER.debug("N. of City Objects:" + members.size());
 
         for (CityObjectMember member : members) {
             parseObject(member.getCityObject(), strategy);

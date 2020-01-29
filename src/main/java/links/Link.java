@@ -9,13 +9,13 @@ public final class Link implements GeometricObject {
     public String Id;
     public String Type;
     public double Distance;
-    public List<Node> Nodes;
+    public List<String> Nodes;
 
     public Link(String id, String type) {
-        this(id, type, 0, new ArrayList<Node>());
+        this(id, type, 0, new ArrayList<>());
     }
 
-    public Link(String id, String type, double distance, List<Node> nodes) {
+    public Link(String id, String type, double distance, List<String> nodes) {
         Id = id;
         Type = type;
         Distance = distance;

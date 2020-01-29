@@ -56,20 +56,11 @@ public class NearEnoughStrategy implements GeometricStrategy {
     @Override
     public List<? extends GeometricObject> results() {
         LOGGER.debug("N. of Shapes:" + shapes.size());
-        generateLinks(GeometryOperations.checkNearEnough(shapes));
-        return links;
-    }
-
-    private void generateLinks(List<Triplet<String, String, Double>> rels) {
-        for (Triplet<String, String, Double> rel : rels) {
-            String id = rel.getValue0() + "@@" + rel.getValue1();
-            List<Node> nodes = new ArrayList<>();
-            nodes.add(Node.fromId(rel.getValue0()));
-            nodes.add(Node.fromId(rel.getValue1()));
-
-            Link l = new Link(id,"NearEnoughRelation",
-                    rel.getValue2(), nodes );
-            links.add(l);
-        }
+        List<Link> geometries =
+                GeometryOperations.checkNearEnough(shapes);
+        LOGGER.debug("Computed Relations.");
+        //generateLinks(geometries);
+        shapes = null;
+        return geometries;
     }
 }
