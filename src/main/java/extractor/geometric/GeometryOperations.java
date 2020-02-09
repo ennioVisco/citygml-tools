@@ -15,7 +15,7 @@ import java.util.*;
 
 public class GeometryOperations {
 
-    public static final double DISTANCE_THRESHOLD = 0;
+    public static double DISTANCE_THRESHOLD;
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**

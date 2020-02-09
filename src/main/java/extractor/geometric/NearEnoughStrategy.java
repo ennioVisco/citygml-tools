@@ -30,11 +30,11 @@ public class NearEnoughStrategy implements GeometricStrategy {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private Map<String, AbstractGeometry> shapes;
-    private List<Link> links;
+    private int distance = 0;
 
-    public NearEnoughStrategy() {
-        this.links = new ArrayList<>();
+    public NearEnoughStrategy(int distance) {
         this.shapes = new HashMap<>();
+        this.distance = distance;
     }
 
     /**
@@ -56,8 +56,8 @@ public class NearEnoughStrategy implements GeometricStrategy {
     @Override
     public List<? extends GeometricObject> results() {
         LOGGER.debug("N. of Shapes:" + shapes.size());
-        List<Link> geometries =
-                GeometryOperations.checkNearEnough(shapes);
+        GeometryOperations.DISTANCE_THRESHOLD = distance;
+        List<Link> geometries = GeometryOperations.checkNearEnough(shapes);
         LOGGER.debug("Computed Relations.");
         //generateLinks(geometries);
         shapes = null;
