@@ -89,18 +89,18 @@ public class Operations {
      * @throws IOException thrown if the file is not found.
      */
     public static void storeFile(List<Link> links, String file) throws IOException {
-        String xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        String xml_header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         FileWriter writer = new FileWriter(file);
         Link.presentation = "ADE"; // Sets the style of the output of a link
 
         writer.write(xml_header + System.lineSeparator());
-        writer.write("<topology:relations>\n" + System.lineSeparator());
+        writer.write("<topology:relations>" + System.lineSeparator());
 
         for(Link link: links) {
-            writer.write(link.toString() + System.lineSeparator());
+            writer.write(link.toString());
         }
 
-        writer.write("</topology:relations>\n" + System.lineSeparator());
+        writer.write("</topology:relations>" + System.lineSeparator());
         writer.close();
     }
 }
