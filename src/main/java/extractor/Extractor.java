@@ -68,29 +68,33 @@ public class Extractor {
      *            geometrical semantics of the operation
      */
     private void parseObject(AbstractCityObject obj, GeometricStrategy str) {
-        if (obj instanceof AbstractBuilding) {
-            AbstractBuilding b = (AbstractBuilding) obj;
-            parseBuilding(b, str);
-        } else
-        //if (object instanceof AbstractBoundarySurface) {
+        if (obj instanceof AbstractBuilding)
+            parseBuilding((AbstractBuilding) obj, str);
+        else
             throw new NotImplementedException("Unsupported City Object!");
-        //}
     }
 
 
-
+    /**
+     * Extracts the geometric shapes of the given building and calls <Code>ParseSolid</Code>
+     * @param b CityGML Building object to parse
+     * @param str the Strategy to perform over the object
+     */
     private void parseBuilding(AbstractBuilding b, GeometricStrategy str) {
+        // Prioritize LOD2 first-level geometry
         if (!isNull(b.getLod2Solid())) {
-            parseSolid(b.getId(), b.getLod2Solid(), str);
+            evalSolid(b.getId(), b.getLod2Solid(), str);
+        // Otherwise, check whether the building is made of Building Parts
         } else if (b.isSetConsistsOfBuildingPart()) {
             List<BuildingPartProperty> ps = b.getConsistsOfBuildingPart();
+
             for (BuildingPartProperty p : ps) {
                 BuildingPart bp = p.getBuildingPart();
-                if (!isNull(bp.getLod2Solid())) {
-                    parseSolid(bp.getId(), bp.getLod2Solid(), str);
-                } else if (!isNull(bp.getLod1Solid())) {
+                if (!isNull(bp.getLod2Solid()))
+                    evalSolid(bp.getId(), bp.getLod2Solid(), str);
+                else if (!isNull(bp.getLod1Solid()))
                     LOGGER.warn("Ignoring LOD1-only object!");
-                } else
+                else
                     throw new NotImplementedException
                             ("Unsupported geometry LOD at BuildingPart@"
                                     + bp.getId());
@@ -100,9 +104,16 @@ public class Extractor {
                     ("Unsupported geometry LOD at Building@" + b.getId());
     }
 
-    private void parseSolid(String id, SolidProperty shape,
-                            GeometricStrategy str) {
-        AbstractSolid s = shape.getSolid();
+    /**
+     * Parser for gml:solid object.
+     * It takes the geometric object and evaluates the given
+     * geometric strategy over it.
+     * @param id Reference to the object to which the geometry is related
+     * @param sp the 3D geometric object
+     * @param str the Geometric Strategy to evaluate
+     */
+    private void evalSolid(String id, SolidProperty sp, GeometricStrategy str) {
+        AbstractSolid s = sp.getSolid();
         str.evaluate(id, s);
     }
 

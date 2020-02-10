@@ -5,6 +5,8 @@ import extractor.geometric.GeometricObject;
 import extractor.geometric.GeometricStrategy;
 import extractor.geometric.NearEnoughStrategy;
 import links.Link;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.citygml4j.CityGMLContext;
 import org.citygml4j.builder.jaxb.CityGMLBuilder;
 import org.citygml4j.builder.jaxb.CityGMLBuilderException;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class Operations {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * IO Action: model loader from .gml file
@@ -41,6 +44,33 @@ public class Operations {
     }
 
     /**
+     * It extracts a set of links from the given CityGML source.
+     * @param input CityGML source file to analyze
+     * @param distance maximum distance to consider
+     * @return set of links within that distance bound
+     */
+    public static List<Link> runExtractor(String input, String distance) {
+        CityModel cityGML;
+        List<? extends GeometricObject> links = null;
+
+        LOGGER.info("Loading CityGML model at: " + input + "...");
+        try {
+            cityGML = loadCityModel(input);
+            LOGGER.info("Processing Link Extraction routine...");
+            links = extractLinks(cityGML, Integer.parseInt(distance));
+
+        } catch(CityGMLReadException e) {
+            LOGGER.error("Unable to read the CityGML file at: " + input);
+            e.printStackTrace();
+        } catch (CityGMLBuilderException e) {
+            LOGGER.error("Undefined error when loading the CityGML file.");
+            e.printStackTrace();
+        }
+
+        return (List<Link>)links;
+    }
+
+    /**
      * Extraction wrapper for the extractor.Extractor module
      *
      * @param model the CityModel from citygml4j
@@ -60,6 +90,7 @@ public class Operations {
      */
     public static void storeFile(List<Link> links, String file) throws IOException {
         FileWriter writer = new FileWriter(file);
+        Link.presentation = "ADE"; // Sets the style of the output
         for(Link link: links) {
             writer.write(link.toString() + System.lineSeparator());
         }

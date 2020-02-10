@@ -1,15 +1,10 @@
 package extractor.geometric;
 
 import links.Link;
-import links.Node;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.citygml4j.geometry.BoundingBox;
 import org.citygml4j.model.gml.geometry.AbstractGeometry;
 import org.citygml4j.model.gml.geometry.primitives.AbstractSolid;
-import org.javatuples.Triplet;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +51,13 @@ public class NearEnoughStrategy implements GeometricStrategy {
     @Override
     public List<? extends GeometricObject> results() {
         LOGGER.debug("N. of Shapes:" + shapes.size());
-        GeometryOperations.DISTANCE_THRESHOLD = distance;
-        List<Link> geometries = GeometryOperations.checkNearEnough(shapes);
+
+        ProximityOperations.MAX_DIST = distance;
+        List<Link> geometries = ProximityOperations.checkNearEnough(shapes);
+
         LOGGER.debug("Computed Relations.");
-        //generateLinks(geometries);
-        shapes = null;
+        shapes = null; //Trying to optimize garbage collection.
+
         return geometries;
     }
 }

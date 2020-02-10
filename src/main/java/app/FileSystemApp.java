@@ -1,6 +1,5 @@
 package app;
 
-import extractor.geometric.GeometricObject;
 import links.Link;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,9 +10,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.citygml4j.builder.jaxb.CityGMLBuilderException;
-import org.citygml4j.model.citygml.core.CityModel;
-import org.citygml4j.xml.io.reader.CityGMLReadException;
+import statistics.Statistics;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,9 +21,10 @@ import static app.Operations.*;
 public class FileSystemApp {
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private CommandLine line;
+
     /**
      * Application entry point.
-     *
      * @param args application command line arguments
      */
     public static void main(String[] args) {
@@ -36,72 +34,80 @@ public class FileSystemApp {
 
     /**
      * Runs the application
-     *
      * @param args an array of String arguments to be parsed
      */
     private void run(String[] args) {
-
-        CommandLine line = parseArguments(args);
+        line = parseArguments(args);
 
         if (line.hasOption("command")) {
 
-            //System.out.println(line.getOptionValue("role"));
             String command = line.getOptionValue("command");
+            switch(command) {
+                case "e": // "extraction" commmand...
+                case "extract":
+                    processExtract();
+                    break;
+                case "s": // "extraction" commmand...
+                case "stats":
+                    processStats();
+                    break;
+                default: // unknown commmand...
+                    printAppHelp();
+            }
 
-            if( command.equals("e")) //if "Extraction" commmand...
-                if(line.hasOption("input") && line.hasOption("distance")) {
-                    String input = line.getOptionValue("input");
-                    String distance = line.getOptionValue("distance");
-                    String output = ".";
-                    if(line.hasOption("output"))
-                        output = line.getOptionValue("output");
-
-                    runExtractor(input, distance, output);
-                }
-            else
-                printAppHelp();
-
-        } else { //Default: Peer...
+        } else { // no command
             printAppHelp();
             LOGGER.info("No parameter provided. Terminating...");
         }
     }
 
-    private void runExtractor(String input, String distance, String output) {
-        CityModel cityGML;
-        List<? extends GeometricObject> links;
+    /**
+     * Handler for Extraction arguments, that triggers the
+     * link extraction routine
+     */
+    private void processExtract() {
+        if(line.hasOption("input") && line.hasOption("distance")) {
+            String input = line.getOptionValue("input");
+            String distance = line.getOptionValue("distance");
+            String output = ".";
+
+            if(line.hasOption("output"))
+                output = line.getOptionValue("output");
+
+            List<Link> data = runExtractor(input, distance);
+            store(data, input, output);
+        }
+    }
+
+    /**
+     * Not working: should generate a report of some meaningful stats.
+     */
+    private void processStats() {
+        Statistics statistics = null;
 
         //GMLExporter exporter = null;
-        //Statistics statistics = null;
-
-        LOGGER.info("Loading CityGML model at: " + input + "...");
-        try {
-            cityGML = loadCityModel(input);
-            LOGGER.info("Processing Link Extraction routine...");
-            links = extractLinks(cityGML, Integer.parseInt(distance));
-            store((List<Link>)links, input, output);
-
-        } catch(CityGMLReadException e) {
-            LOGGER.error("Unable to read the CityGML file.");
-            e.printStackTrace();
-        } catch (CityGMLBuilderException e) {
-            LOGGER.error("Undefined error when loading CityGML file.");
-            e.printStackTrace();
-        }
-
-        //System.out.println(links.toString());
-
-        //System.out.println("Export to GML..");
+        System.out.println("Export to GML..");
         //exporter = new GMLExporter(city2D);
         //exporter.export();
 
         //statistics = exporter.getStatistics();
-        //System.out.println("Writing statistics (CSV)..");
-        //statistics.exportToCSV();
-        //System.out.println("Writing statistics (Latex)..");
-        //statistics.exportToLatex();
+        try {
+            System.out.println("Writing statistics (CSV)..");
+            statistics.exportToCSV();
+            System.out.println("Writing statistics (Latex)..");
+            statistics.exportToLatex();
+        } catch (IOException e) {
+            LOGGER.error("Unable to write stats file.");
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Routine to store the extracted links in a given file directory.
+     * @param data links to be stored
+     * @param file file from which the link were extracted
+     * @param o_dir directory where the new file should be stored
+     */
     private void store(List<Link> data, String file, String o_dir) {
         String output_base = FilenameUtils.getBaseName(file) + "_topo.";
         String output = output_base + FilenameUtils.getExtension(file);
@@ -117,7 +123,6 @@ public class FileSystemApp {
 
     /**
      * Parses application arguments
-     *
      * @param args application arguments
      * @return <code>CommandLine</code> which represents a list of application
      * arguments.
@@ -146,7 +151,6 @@ public class FileSystemApp {
 
     /**
      * Generates application command line options
-     *
      * @return application <code>Options</code>
      */
     private Options getOptions() {
@@ -161,7 +165,7 @@ public class FileSystemApp {
     }
 
     /**
-     * Prints application help
+     * Prints application usage instructions
      */
     private void printAppHelp() {
         Options options = getOptions();

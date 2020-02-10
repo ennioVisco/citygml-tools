@@ -1,3 +1,5 @@
+package statistics;
+
 public class StatisticsEntry {
 
 	public static final String[] HEADERS = new String[] { "#Buildings", "#Blocks", "#RoadSegments", "#Crossroads",
