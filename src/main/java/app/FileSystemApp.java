@@ -49,8 +49,15 @@ public class FileSystemApp {
             String command = line.getOptionValue("command");
 
             if( command.equals("e")) //if "Extraction" commmand...
-                if(line.hasOption("input") && line.hasOption("distance"))
-                    runExtractor(line.getOptionValue("input"), line.getOptionValue("distance"));
+                if(line.hasOption("input") && line.hasOption("distance")) {
+                    String input = line.getOptionValue("input");
+                    String distance = line.getOptionValue("distance");
+                    String output = ".";
+                    if(line.hasOption("output"))
+                        output = line.getOptionValue("output");
+
+                    runExtractor(input, distance, output);
+                }
             else
                 printAppHelp();
 
@@ -60,7 +67,7 @@ public class FileSystemApp {
         }
     }
 
-    private void runExtractor(String input, String distance) {
+    private void runExtractor(String input, String distance, String output) {
         CityModel cityGML;
         List<? extends GeometricObject> links;
 
@@ -72,7 +79,7 @@ public class FileSystemApp {
             cityGML = loadCityModel(input);
             LOGGER.info("Processing Link Extraction routine...");
             links = extractLinks(cityGML, Integer.parseInt(distance));
-            store((List<Link>)links, input);
+            store((List<Link>)links, input, output);
 
         } catch(CityGMLReadException e) {
             LOGGER.error("Unable to read the CityGML file.");
@@ -95,13 +102,13 @@ public class FileSystemApp {
         //statistics.exportToLatex();
     }
 
-    private void store(List<Link> data, String file) {
+    private void store(List<Link> data, String file, String o_dir) {
         String output_base = FilenameUtils.getBaseName(file) + "_topo.";
         String output = output_base + FilenameUtils.getExtension(file);
 
         LOGGER.info("Storing links at: " + output + "...");
         try{
-            storeFile(data, output);
+            storeFile(data, o_dir + output);
         } catch (IOException e) {
             LOGGER.error("Unable to store the output file.");
             e.printStackTrace();
@@ -149,6 +156,7 @@ public class FileSystemApp {
         options.addOption("c", "command", true, "operation to execute");
         options.addOption("i", "input", true, "CityGML file to load");
         options.addOption("d", "distance", true, "max distance (for extraction routine)");
+        options.addOption("o", "output", true, "output file directory");
         return options;
     }
 
