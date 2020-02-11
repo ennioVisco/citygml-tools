@@ -19,6 +19,7 @@ public class ProximityOperations {
 
     /**
      * Distance threshold, over which, objects are discarded
+     * -1 represents infinite distance
      */
     public static double MAX_DIST = 0;
 
@@ -83,17 +84,17 @@ public class ProximityOperations {
                 Pair<String, Geometry> g2 = geometries.get(j);
 
                 double d = DistanceOp.distance(g1.getValue(), g2.getValue());
-                if(d > MAX_DIST)
+                if(d <= MAX_DIST || MAX_DIST == -1) {
                     LOGGER.trace("Geometries:<" + g1.getKey() + "> and <" +
-                            g2.getKey() + "> are " + (d - MAX_DIST) + " too far!");
-                else {
-                    LOGGER.trace("Geometries:<" + g1.getKey() + "> and <" +
-                            g2.getKey() + "> are touching!");
+                            g2.getKey() + "> are close enough!");
 
                     String id = g1.getKey() + "@@" + g2.getKey();
                     near.add(new Link(id, "topoNear",
                             d, toNodes(g1.getKey(), g2.getKey())));
                 }
+                else
+                    LOGGER.trace("Geometries:<" + g1.getKey() + "> and <" +
+                            g2.getKey() + "> are " + (d - MAX_DIST) + " too far!");
             }
         }
         return near;
